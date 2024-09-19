@@ -50,6 +50,19 @@ void *forward_to_backend(void *client_socket_ptr) {
 		close(backend_socket);
 		pthread_exit(NULL);
 	}
+	
+	char buffer[1024];
+	int bytes_read;
+	while ((bytes_read = read(client_socket, buffer, sizeof(buffer))) > 0) {
+		send(backend_socket, buffer, bytes_read, 0);
+		bytes_read = read(backend_socket, buffer, sizeof(buffer));
+		send(client_socket, buffer , bytes_read, 0);
+	}
+
+	close(client_socket);
+	close(backend_socket);
+	pthread_exit(NULL);
+
 
 
 
